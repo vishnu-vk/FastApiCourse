@@ -57,8 +57,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: models.Use
     if not delete_post.owner_id == current_user.id:
         raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail= f"post with id {id} was not yours to delete")
     
-    delete_post.delete(synchronize_session= False)
-    # delete_post.delete(synchronize_session= False)
+    db.query(models.Post).filter(models.Post.id == id).delete(synchronize_session= False)
     db.commit()
 
     return Response(status_code= status.HTTP_204_NO_CONTENT)
@@ -68,6 +67,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: models.Use
 @router.put("/{id}", response_model= schemas.PostResponse)
 def update_post(id: int, post: schemas.PostUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
     
+    update_post_query = db.query(models.Post).filter(models.Post.id == id)
     update_post = db.query(models.Post).filter(models.Post.id == id).first()
 
     if update_post == None:
@@ -76,7 +76,7 @@ def update_post(id: int, post: schemas.PostUpdate, db: Session = Depends(get_db)
     if not update_post.owner_id == current_user.id:
         raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail= f"post with id {id} was not yours to update")
     
-    update_post.update(post.dict(), synchronize_session= False)
+    update_post_query.update(post.dict(), synchronize_session= False)
     db.commit()
     
-    return update_post.first()
+    return update_post_query.first()
