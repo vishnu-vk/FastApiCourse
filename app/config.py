@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseSettings
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 class Settings(BaseSettings):
     database_hostname: str
@@ -17,5 +17,5 @@ class Settings(BaseSettings):
         case_sensitive = False
         env_file = ".env"
 
-load_dotenv()
+# load_dotenv()
 settings = Settings()
